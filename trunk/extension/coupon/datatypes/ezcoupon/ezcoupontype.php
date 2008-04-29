@@ -16,6 +16,11 @@ include_once( 'extension/coupon/classes/xrowcoupon.php' );
 
 class ezCouponType extends eZDataType
 {
+	const DISCOUNT_TYPE_PERCENT = 0;
+	const DISCOUNT_TYPE_FLAT = 1;
+	const DISCOUNT_TYPE_FREE_SHIPPING = 2;
+	const DEFAULT_CURRENT_COUPON = 1;
+	const DEFAULT_EMTPY = 0;
     function ezCouponType()
     {
         $this->eZDataType( EZ_DATATYPESTRING_COUPON, ezi18n( 'kernel/classes/datatypes', "Coupon", 'Datatype name' ),
@@ -41,7 +46,7 @@ class ezCouponType extends eZDataType
     */
     function validateObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
     {
-        $return = EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+        $return = eZInputValidator::STATE_ACCEPTED;
         if ( $http->hasPostVariable( $base . '_coupon_year_' . $contentObjectAttribute->attribute( 'id' ) ) and
              $http->hasPostVariable( $base . '_coupon_month_' . $contentObjectAttribute->attribute( 'id' ) ) and
              $http->hasPostVariable( $base . '_coupon_day_' . $contentObjectAttribute->attribute( 'id' ) ) )
@@ -58,13 +63,13 @@ class ezCouponType extends eZDataType
                 {
                     $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
                                                                          'Missing date input.' ) );
-                    $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+                    $return = eZInputValidator::STATE_INVALID;
                 }
             }
             else
             {
                 if ( $this->validateDateTimeHTTPInput( $day, $month, $year, $contentObjectAttribute ) == EZ_INPUT_VALIDATOR_STATE_INVALID )
-                    $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+                    $return = eZInputValidator::STATE_INVALID;
                 $date = new eZDate();
                 $date->setMDY( $month, $day, $year );
             }
@@ -86,13 +91,13 @@ class ezCouponType extends eZDataType
                 {
                     $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
                                                                          'Missing date input.' ) );
-                    $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+                    $return = eZInputValidator::STATE_INVALID;
                 }
             }
             else
             {
                 if ( $this->validateDateTimeHTTPInput( $day, $month, $year, $contentObjectAttribute ) == EZ_INPUT_VALIDATOR_STATE_INVALID )
-                    $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+                    $return = eZInputValidator::STATE_INVALID;
                 $date2 = new eZDate();
                 $date2->setMDY( $month, $day, $year );
             }
@@ -101,7 +106,7 @@ class ezCouponType extends eZDataType
         {
             $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
                                                                  'Expiry date incorrect.' ) );
-            $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+            $return = eZInputValidator::STATE_INVALID;
         }
         if ( $http->hasPostVariable( $base . "_coupon_discount_" . $contentObjectAttribute->attribute( "id" ) ) )
         {
@@ -110,16 +115,16 @@ class ezCouponType extends eZDataType
             include_once( 'lib/ezlocale/classes/ezlocale.php' );
             $locale =& eZLocale::instance();
             $data = $locale->internalCurrency( $data );
-            $classAttribute =& $contentObjectAttribute->contentClassAttribute();
+
             if( $contentObjectAttribute->validateIsRequired() && ( $data == "" or  $data <= 0 ) )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
                                                                  'No discount set.' ) );
-                $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+                $return = eZInputValidator::STATE_INVALID;
             }
             if ( !preg_match( "#^[0-9]+(.){0,1}[0-9]{0,2}$#", $data ) )
             {
-                $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+                $return = eZInputValidator::STATE_INVALID;
 
                 $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
                                                                  'Invalid discount.' ) );
@@ -130,13 +135,13 @@ class ezCouponType extends eZDataType
                 {
                    $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
                                                                  'Give a discount value between nero and 100.' ) );
-                   $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+                   $return = eZInputValidator::STATE_INVALID;
                 }
             }
         }
         if ( $http->hasPostVariable( $base . '_coupon_code_' . $contentObjectAttribute->attribute( 'id' ) ) and $http->postVariable( $base . '_coupon_code_' . $contentObjectAttribute->attribute( 'id' ) ) == "" )
         {
-            $return = EZ_INPUT_VALIDATOR_STATE_INVALID;
+            $return = eZInputValidator::STATE_INVALID;
             $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
                                                                  'Invalid coupon code.' ) );
         }
@@ -282,7 +287,7 @@ class ezCouponType extends eZDataType
     */
     function title( &$contentObjectAttribute )
     {
-        $locale =& eZLocale::instance();
+        $locale = eZLocale::instance();
         $array = $contentObjectAttribute->objectAttributeContent( );
         $retVal = $array['code'];
         return $retVal;
