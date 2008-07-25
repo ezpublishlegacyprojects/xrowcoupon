@@ -80,7 +80,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
             {
                 foreach ( $list as $item )
                 {
-                    $item->removeItem( $item->ID );
+                    $item->remove();
                 }
                 
 	        }
