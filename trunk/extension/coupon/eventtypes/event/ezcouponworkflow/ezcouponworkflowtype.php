@@ -49,7 +49,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
         foreach ( array_keys( $orderItems ) as $key )
         {
             $orderItem =& $orderItems[$key];
-            if ( $orderItem->attribute( 'description' ) == "Shipping" )
+            if ( $orderItem->attribute( 'type' ) == "shippingcost" )
             {
                 $shippingvalue = $orderItem->attribute('price');
             }
