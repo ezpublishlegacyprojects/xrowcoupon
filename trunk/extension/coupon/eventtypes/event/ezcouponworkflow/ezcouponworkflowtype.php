@@ -7,6 +7,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
 	const STATE_INVALID_CODE = 3;
 	const STATE_VALID_CODE = 1;
 	const BASE = 'event_ezcoupon';
+
     /*!
      Constructor
     */
@@ -18,7 +19,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
 
     function execute( $process, $event )
     {
-        $http =& eZHTTPTool::instance();
+        $http = eZHTTPTool::instance();
         $this->fetchInput( $http, eZCouponWorkflowType::BASE, $event, $process );
         if( $process->attribute( 'event_state' ) == eZCouponWorkflowType::STATE_CANCEL )
         {
@@ -33,7 +34,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
             return eZWorkflowType::STATUS_FETCH_TEMPLATE_REPEAT;
 
         }
-        $ini =& eZINI::instance( 'xrowcoupon.ini' );
+        $ini = eZINI::instance( 'xrowcoupon.ini' );
         $coupon = new xrowCoupon( $event->attribute( "data_text1" ) );
         $attribute = $coupon->fetchAttribute();
         $data = $attribute->content();
@@ -82,7 +83,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
                 {
                     $item->remove();
                 }
-                
+
 	        }
             $orderItem = new eZOrderItem( array( 'order_id' => $orderID,
                                                  'description' => $description,
@@ -93,7 +94,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
                                           );
             $orderItem->store();
         }
-        
+
         return eZWorkflowEventType::STATUS_ACCEPTED;
     }
     function fetchInput( &$http, $base, &$event, &$process )
@@ -118,7 +119,7 @@ class eZCouponWorkflowType extends eZWorkflowEventType
             }
             else
             {
-                $process->setAttribute( 'event_state', eZCouponWorkflowType::STATE_INVALID_CODE ); 
+                $process->setAttribute( 'event_state', eZCouponWorkflowType::STATE_INVALID_CODE );
                 return;
             }
         }
@@ -128,11 +129,11 @@ class eZCouponWorkflowType extends eZWorkflowEventType
         if ( is_object( $order ) )
         {
             $xml = new eZXML();
-            $xmlDoc =& $order->attribute( 'data_text_1' );
+            $xmlDoc = $order->attribute( 'data_text_1' );
             if( $xmlDoc != null )
             {
-                $dom =& $xml->domTree( $xmlDoc );
-                $id =& $dom->elementsByName( "coupon_code" );
+                $dom = $xml->domTree( $xmlDoc );
+                $id = $dom->elementsByName( "coupon_code" );
                 if ( is_object( $id[0] ) )
                 {
                     $code = $id[0]->textContent();
