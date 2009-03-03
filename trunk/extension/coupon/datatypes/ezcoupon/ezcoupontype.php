@@ -86,7 +86,7 @@ class ezCouponType extends eZDataType
             }
             else
             {
-                if ( $this->validateDateTimeHTTPInput( $day, $month, $year, $contentObjectAttribute ) == EZ_INPUT_VALIDATOR_STATE_INVALID )
+                if ( $this->validateDateTimeHTTPInput( $day, $month, $year, $objectAttribute ) == eZInputValidator::STATE_INVALID )
                     $return = eZInputValidator::STATE_INVALID;
                 $date2 = new eZDate();
                 $date2->setMDY( $month, $day, $year );
@@ -133,8 +133,8 @@ class ezCouponType extends eZDataType
              $http->postVariable( $base . '_coupon_code_' . $id ) == "" )
         {
             $return = eZInputValidator::STATE_INVALID;
-            $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
-                                                                 'Invalid coupon code.' ) );
+            $objectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
+                                                          'Invalid coupon code.' ) );
         }
         return $return;
     }
@@ -176,7 +176,7 @@ class ezCouponType extends eZDataType
             $month = $http->postVariable( $base . '_coupon_till_month_' . $id );
             $day   = $http->postVariable( $base . '_coupon_till_day_' . $id );
             $datetill = new eZDate();
-            $contentClassAttribute = $objectAttribute->contentClassAttribute();
+            #$contentClassAttribute = $objectAttribute->contentClassAttribute();
 
             if ( ( $year == '' and $month == '' and $day == '' ) or
                  !checkdate( $month, $day, $year ) or
